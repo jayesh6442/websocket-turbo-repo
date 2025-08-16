@@ -15,6 +15,7 @@ export async function findUserByEmail(email: string) {
 
 
 export async function findUserById(id: number) {
+    // @ts-ignore
     return prisma.user.findUnique({ where: { id } });
 }
 export async function validatePassword(password: string, hash: string) {
