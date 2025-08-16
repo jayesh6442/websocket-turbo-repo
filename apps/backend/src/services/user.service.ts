@@ -2,7 +2,6 @@ import prisma from "@repo/db";
 import bcrypt from "bcrypt";
 
 export async function createUser(email: string, password: string, name: string) {
-    console.log("Creating user:", { email, name });
     const hashedPassword = await bcrypt.hash(password, 10);
     return prisma.user.create({
         data: { email, password: hashedPassword, name },
