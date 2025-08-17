@@ -7,6 +7,11 @@
     "@types/bun": "latest",
     "@types/express": "^5.0.3"
   },
+  "scripts": {
+     "dev": "bun run --watch src/index.ts",  
+    "start": "bun run src/index.ts",        
+    "build": "bun build src/index.ts --outdir dist"
+  },
   "peerDependencies": {
     "typescript": "^5"
   },

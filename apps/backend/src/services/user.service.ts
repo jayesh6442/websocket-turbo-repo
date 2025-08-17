@@ -20,3 +20,12 @@ export async function findUserById(id: number) {
 export async function validatePassword(password: string, hash: string) {
     return bcrypt.compare(password, hash);
 }
+
+
+export async function createRoom() {
+    // return prisma.room.create({
+    //     data: {
+    //         // room data
+    //     }
+    // });
+}
