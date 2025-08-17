@@ -1,19 +1,25 @@
 // apps/ws/src/index.ts
 import { WebSocketServer, WebSocket } from "ws";
-import jwt from "jsonwebtoken";
-import { RoomManager } from "./roomManager.js";
+import { roomManager } from "./roomManager.js";        // ⬅️ import singleton
 import { verifyToken } from "./auth.js";
+import { enqueueChatMessage } from "./chat.js";         // ⬅️ producer
+import { startChatConsumer } from "./chatConsumer.js";  // ⬅️ consumer
 
 const wss = new WebSocketServer({ port: 8080 });
-const roomManager = new RoomManager();
+
+// Start Kafka consumer once at boot
+startChatConsumer().catch((e) => {
+    console.error("Kafka consumer failed to start:", e);
+    process.exit(1);
+});
 
 wss.on("connection", (ws: WebSocket) => {
-    ws.on("message", (msg) => {
+    ws.on("message", async (msg) => {
         try {
             const data = JSON.parse(msg.toString());
 
             switch (data.type) {
-                case "auth":
+                case "auth": {
                     const user = verifyToken(data.token);
                     if (!user) {
                         ws.send(JSON.stringify({ type: "error", message: "Invalid token" }));
@@ -23,24 +29,46 @@ wss.on("connection", (ws: WebSocket) => {
                     (ws as any).user = user;
                     ws.send(JSON.stringify({ type: "auth_success", user }));
                     break;
+                }
 
-                case "join_room":
+                case "join_room": {
                     if (!(ws as any).user) return;
                     roomManager.joinRoom(data.roomId, ws);
                     break;
+                }
 
-                case "leave_room":
+                case "leave_room": {
                     if (!(ws as any).user) return;
                     roomManager.leaveRoom(data.roomId, ws);
                     break;
+                }
 
-                case "message":
-                    if (!(ws as any).user) return;
-                    roomManager.sendMessage(data.roomId, (ws as any).user, data.text);
+                case "message": {
+                    const user = (ws as any).user;
+                    if (!user) return;
+
+                    const { roomId, text } = data;
+                    if (!roomId || !text?.trim()) {
+                        ws.send(JSON.stringify({ type: "error", message: "roomId and text are required" }));
+                        return;
+                    }
+
+                    // produce to Kafka (no broadcast here)
+                    const event = await enqueueChatMessage({
+                        roomId,
+                        content: text,
+                        senderId: user.id,
+                    });
+                    console.log("--------------------------------------------",event);
+
+                    // Optional: ack the sender that it was queued
+                    ws.send(JSON.stringify({ type: "queued", roomId, tempId: "temp-" + Date.now(), createdAt: event.createdAt   }));
                     break;
+                }
             }
         } catch (err) {
             console.error("Invalid WS message", err);
+            ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
         }
     });
 

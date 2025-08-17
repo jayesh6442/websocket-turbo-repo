@@ -5,9 +5,7 @@ export class RoomManager {
     private rooms: Map<string, Set<WebSocket>> = new Map();
 
     joinRoom(roomId: string, ws: WebSocket) {
-        if (!this.rooms.has(roomId)) {
-            this.rooms.set(roomId, new Set());
-        }
+        if (!this.rooms.has(roomId)) this.rooms.set(roomId, new Set());
         this.rooms.get(roomId)!.add(ws);
 
         ws.send(JSON.stringify({ type: "joined_room", roomId }));
@@ -21,12 +19,17 @@ export class RoomManager {
     }
 
     sendMessage(roomId: string, user: any, text: string) {
-        this.broadcast(roomId, {
-            type: "message",
-            roomId,
-            user,
-            text,
-        });
+        this.broadcast(roomId, { type: "message", roomId, user, text });
+    }
+
+    public broadcast(roomId: string, message: any) {
+        const members = this.rooms.get(roomId);
+        if (!members) return;
+        for (const client of members) {
+            if (client.readyState === client.OPEN) {
+                client.send(JSON.stringify(message));
+            }
+        }
     }
 
     removeConnection(ws: WebSocket) {
@@ -37,14 +40,7 @@ export class RoomManager {
             }
         });
     }
-
-    private broadcast(roomId: string, message: any) {
-        const members = this.rooms.get(roomId);
-        if (!members) return;
-        for (const client of members) {
-            if (client.readyState === client.OPEN) {
-                client.send(JSON.stringify(message));
-            }
-        }
-    }
 }
+
+// 👇 export ONE shared instance
+export const roomManager = new RoomManager();
