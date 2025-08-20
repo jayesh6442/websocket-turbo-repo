@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createRoom, findRoomById, findRooms } from "../services/room.service.js";
+import roomSchema from "../models/room.model.js";
 
 export async function getRooms(req: Request, res: Response) {
     try {
@@ -40,9 +41,12 @@ export async function createRoomController(req: Request, res: Response) {
     if (!userId) {
         return res.status(401).json({ error: "Unauthorized" });
     }
+    const safeData = roomSchema.safeParse(req.body);
 
-    const { name } = req.body;
-
+    if (!safeData.success) {
+        return res.status(400).json({ error: "Invalid room data", issues: safeData.error.issues });
+    }
+    const { name } = safeData.data;
     try {
         const room = await createRoom(name, userId);
         res.status(201).json(room);
