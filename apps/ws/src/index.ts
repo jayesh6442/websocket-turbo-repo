@@ -62,9 +62,6 @@ wss.on("connection", (ws: WebSocket) => {
                         content: text,
                         senderId: user.userId,
                     });
-                    console.log("---------------------------------------------------------------------------");
-                    console.log(event);
-                    console.log("---------------------------------------------------------------------------");
                     // Optional: ack the sender that it was queued
                     ws.send(JSON.stringify({ type: "queued", roomId, tempId: "temp-" + Date.now(), createdAt: event.createdAt }));
                     break;

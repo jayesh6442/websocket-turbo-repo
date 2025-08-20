@@ -1,6 +1,6 @@
 // apps/ws/src/chatConsumer.ts
 import { kafkaConsumer } from "@repo/kafka";
-import prisma from "@repo/db"; // adjust if your client path differs
+import prisma from "@repo/db"; 
 import { roomManager } from "./roomManager.js";
 
 export async function startChatConsumer() {
