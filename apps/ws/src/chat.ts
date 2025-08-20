@@ -16,8 +16,9 @@ export async function enqueueChatMessage(input: EnqueueChatInput) {
         senderId: input.senderId,
         createdAt: input.createdAt ?? new Date().toISOString(),
     };
+    console.log(event);
     await kafkaProducer.connect(); // Ensure producer is connected
-    
+
     await kafkaProducer.send({
         topic: "chat-messages",
         messages: [{ key: event.roomId, value: JSON.stringify(event) }],

@@ -10,6 +10,7 @@ export class RoomManager {
 
         ws.send(JSON.stringify({ type: "joined_room", roomId }));
         this.broadcast(roomId, { type: "user_joined", roomId });
+        console.log(`User joined room ${roomId}`);
     }
 
     leaveRoom(roomId: string, ws: WebSocket) {

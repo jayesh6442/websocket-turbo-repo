@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "Chat System",
+    "_postman_id": "b4c7f8d3-9a2c-48fa-9cbe-xxx",
+    "description": "REST + WebSocket flow for chat system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"jayesh@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/auth/login" }
+      }
+    },
+    {
+      "name": "Rooms - Create Room",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"General Chat\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/rooms" }
+      }
+    },
+    {
+      "name": "Rooms - Get All Rooms",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/rooms" }
+      }
+    },
+    {
+      "name": "Rooms - Get Room by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/rooms/{{roomId}}" }
+      }
+    },
+    {
+      "name": "WebSocket - Auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.sendRequest({",
+              " url: 'ws://localhost:8080',",
+              " method: 'CONNECT',",
+              " body: { mode: 'raw', raw: '{\"type\":\"auth\",\"token\":\"{{token}}\"}' }",
+              "}, function (err, res) {",
+              " console.log(res);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "WebSocket - Join Room",
+      "request": {
+        "method": "CONNECT",
+        "url": { "raw": "ws://localhost:8080" },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"join_room\",\n  \"roomId\": \"{{roomId}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "WebSocket - Send Message",
+      "request": {
+        "method": "CONNECT",
+        "url": { "raw": "ws://localhost:8080" },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"message\",\n  \"roomId\": \"{{roomId}}\",\n  \"text\": \"Hello from Postman!\"\n}"
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "token", "value": "" },
+    { "key": "roomId", "value": "" }
+  ]
+}
+

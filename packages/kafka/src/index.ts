@@ -2,7 +2,7 @@ import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
     clientId: "chat-app",
-    brokers: ["localhost:9092"], // adjust if using docker-compose
+    brokers: ["localhost:9092"],
 });
 
 export const kafkaProducer = kafka.producer();

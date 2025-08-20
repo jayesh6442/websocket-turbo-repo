@@ -28,12 +28,14 @@ wss.on("connection", (ws: WebSocket) => {
                     }
                     (ws as any).user = user;
                     ws.send(JSON.stringify({ type: "auth_success", user }));
+                    console.log(user);
                     break;
                 }
 
                 case "join_room": {
                     if (!(ws as any).user) return;
                     roomManager.joinRoom(data.roomId, ws);
+                    ws.send(JSON.stringify({ type: "room_joined", roomId: data.roomId }));
                     break;
                 }
 
@@ -48,6 +50,7 @@ wss.on("connection", (ws: WebSocket) => {
                     if (!user) return;
 
                     const { roomId, text } = data;
+                    console.log(`User ${user.userId} sent a message to room ${roomId}: ${text}`);
                     if (!roomId || !text?.trim()) {
                         ws.send(JSON.stringify({ type: "error", message: "roomId and text are required" }));
                         return;
@@ -57,12 +60,13 @@ wss.on("connection", (ws: WebSocket) => {
                     const event = await enqueueChatMessage({
                         roomId,
                         content: text,
-                        senderId: user.id,
+                        senderId: user.userId,
                     });
-                    console.log("--------------------------------------------",event);
-
+                    console.log("---------------------------------------------------------------------------");
+                    console.log(event);
+                    console.log("---------------------------------------------------------------------------");
                     // Optional: ack the sender that it was queued
-                    ws.send(JSON.stringify({ type: "queued", roomId, tempId: "temp-" + Date.now(), createdAt: event.createdAt   }));
+                    ws.send(JSON.stringify({ type: "queued", roomId, tempId: "temp-" + Date.now(), createdAt: event.createdAt }));
                     break;
                 }
             }

@@ -27,7 +27,6 @@ export async function startChatConsumer() {
                 },
                 include: { sender: { select: { id: true, name: true, email: true } } },
             });
-            console.error("Failed to save message:", saved);
 
             // Broadcast to room (single source of truth from consumer)
             roomManager.broadcast(event.roomId, {
