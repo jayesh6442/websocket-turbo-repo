@@ -73,14 +73,18 @@ Here are the available REST API endpoints for user and room management.
 
 1.  Clone the repository:
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/jayesh6442/websocket-turbo-repo
     ```
-2.  Install dependencies:
+2.  CD into clone repo:
+    ```bash
+    cd websocket-turbo-repo
+    ```
+3.  Install dependencies:
     ```bash
     bun install
     ```
-3.  Set up your environment variables in a `.env` file.
-4.  Start the development server:
+4.  Set up your environment variables in a `.env` file.
+5.  Start the development server:
     ```bash
     bun dev
     ````
