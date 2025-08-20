@@ -1,49 +1,86 @@
-# CollabApp 🚀
+# Real-time Chat Application
 
-A real-time collaborative application built with **Turborepo**, **Express**, **Postgres**, **WebSockets**, and **Kafka**.  
-The project demonstrates a scalable architecture with authentication, room management, and real-time messaging backed by Kafka pub/sub.
+This project is a scalable real-time chat application that allows users to register, log in, create chat rooms, and exchange messages instantly. It features a robust backend architecture designed for high performance and message persistence, leveraging technologies like WebSockets for real-time communication and Apache Kafka for handling message streams.
 
----
+## ✨ Features
+
+* **User Authentication**: Secure user registration and login using JWT.
+* **Room Management**: Users can create new chat rooms and view all available rooms.
+* **Real-time Messaging**: Instant message delivery using WebSockets.
+* **Persistent Storage**: Messages are asynchronously stored in a PostgreSQL database.
+* **Scalable Architecture**: Built with a monorepo structure using Turborepo and a decoupled message-handling system with Kafka.
 
 ## 🛠️ Tech Stack
-- **[Turborepo](https://turbo.build/repo)** – Monorepo build system  
-- **[Express](https://expressjs.com/)** – Backend framework  
-- **[Postgres](https://www.postgresql.org/)** – Relational database  
-- **[WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)** – Real-time communication  
-- **[Kafka](https://kafka.apache.org/)** – Message streaming and pub/sub  
 
----
+* **Monorepo**: [Turborepo](https://turbo.build/repo)
+* **Backend Framework**: [Express.js](https://expressjs.com/)
+* **Database**: [PostgreSQL](https://www.postgresql.org/)
+* **Real-time Communication**: [ws (WebSocket)](https://github.com/websockets/ws)
+* **Message Broker**: [Apache Kafka](https://kafka.apache.org/)
+* **Runtime/Package Manager**: [Bun](https://bun.sh/)
 
-## ⚙️ Features
+## ⚙️ How It Works
 
-### 🔑 Authentication
-- **User Registration** → `POST /api/user/register`  
-- **Login** → `POST /api/user/login`  
-- JWT-based authentication to secure APIs & WebSocket connections  
+The application follows a modern, decoupled architecture to ensure scalability and reliability.
 
-### 👤 User
-- **Get Profile** → `GET /api/user/profile`  
+1.  **User Authentication**: A user signs up or logs in, and upon success, receives a JSON Web Token (JWT).
+2.  **Room Interaction**: The user can fetch their profile, view a list of all chat rooms, or create a new one.
+3.  **Joining a Room**: To join a room, the user establishes a WebSocket connection, authenticating with their JWT.
+4.  **Sending Messages**: Once connected, the user sends messages through the WebSocket connection to the server.
+5.  **Message Processing**: The Express server receives the message and publishes it to a Kafka topic.
+6.  **Database Persistence**: A separate consumer service listens to the Kafka topic, receives the message, and stores it in the PostgreSQL database. This pub/sub model decouples the real-time component from the database, preventing bottlenecks and ensuring messages are not lost.
 
-### 🏠 Rooms
-- **Create Room** → `POST /api/room/create`  
-- **Get All Rooms** → `GET /api/room/all`  
-- **Join Room** → via WebSocket connection (with JWT)  
+## 🔌 API Endpoints
 
-### 💬 Messaging
-- Users can join rooms and send messages in real time via WebSocket  
-- Messages are published to **Kafka** and stored in **Postgres** via a Kafka consumer  
+Here are the available REST API endpoints for user and room management.
 
----
+### User Routes
 
-## 📡 Workflow
+* **Register a new user**
+    * `POST /api/user/register`
+* **Login a user**
+    * `POST /api/user/login`
+* **Get user profile** (Requires JWT)
+    * `GET /api/user/profile`
 
-1. **Register/Login** → receive JWT  
-2. **Join Room** → authenticate WebSocket connection using JWT  
-3. **Send Messages** → messages go through Kafka pub/sub  
-4. **Persist Messages** → Kafka consumer saves messages in Postgres  
-5. **Retrieve Messages** → fetch chat history per room  
+### Room Routes
 
----
+* **Create a new room** (Requires JWT)
+    * `POST /api/room/create`
+* **Get all available rooms**
+    * `GET /api/room/all`
 
-## 🏗️ Project Structure (Turborepo)
+## 🚀 Real-time Communication (WebSockets)
 
+* **Authentication**: The WebSocket connection is initiated with the user's JWT passed as a query parameter or in the initial handshake.
+* **Join Room**: After authentication, the client sends a message to join a specific `roomId`.
+* **Send Message**: The client sends a JSON payload containing the message content and `roomId`. The server then broadcasts this message to all other clients in the same room.
+
+## 📨 Message Persistence with Kafka
+
+* **Producer**: The main application server acts as a Kafka **producer**. When a message is received via WebSocket, it's immediately sent to a specific Kafka topic (e.g., `chat-messages`).
+* **Consumer**: A dedicated background worker acts as a Kafka **consumer**. It subscribes to the `chat-messages` topic, consumes messages as they arrive, and saves them to the `messages` table in the PostgreSQL database.
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+* [Bun](https://bun.sh/)
+* PostgreSQL
+* Apache Kafka & Zookeeper
+
+### Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone <your-repo-url>
+    ```
+2.  Install dependencies:
+    ```bash
+    bun install
+    ```
+3.  Set up your environment variables in a `.env` file.
+4.  Start the development server:
+    ```bash
+    bun dev
+    ````
