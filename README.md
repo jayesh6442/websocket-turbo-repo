@@ -2,7 +2,7 @@
 
 This project is a scalable real-time chat application that allows users to register, log in, create chat rooms, and exchange messages instantly. It features a robust backend architecture designed for high performance and message persistence, leveraging technologies like WebSockets for real-time communication and Apache Kafka for handling message streams.
 
-## ✨ Features
+##  Features
 
 * **User Authentication**: Secure user registration and login using JWT.
 * **Room Management**: Users can create new chat rooms and view all available rooms.
@@ -10,7 +10,7 @@ This project is a scalable real-time chat application that allows users to regis
 * **Persistent Storage**: Messages are asynchronously stored in a PostgreSQL database.
 * **Scalable Architecture**: Built with a monorepo structure using Turborepo and a decoupled message-handling system with Kafka.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 * **Monorepo**: [Turborepo](https://turbo.build/repo)
 * **Backend Framework**: [Express.js](https://expressjs.com/)
@@ -19,7 +19,7 @@ This project is a scalable real-time chat application that allows users to regis
 * **Message Broker**: [Apache Kafka](https://kafka.apache.org/)
 * **Runtime/Package Manager**: [Bun](https://bun.sh/)
 
-## ⚙️ How It Works
+##  How It Works
 
 The application follows a modern, decoupled architecture to ensure scalability and reliability.
 
@@ -30,7 +30,7 @@ The application follows a modern, decoupled architecture to ensure scalability a
 5.  **Message Processing**: The Express server receives the message and publishes it to a Kafka topic.
 6.  **Database Persistence**: A separate consumer service listens to the Kafka topic, receives the message, and stores it in the PostgreSQL database. This pub/sub model decouples the real-time component from the database, preventing bottlenecks and ensuring messages are not lost.
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 Here are the available REST API endpoints for user and room management.
 
@@ -50,18 +50,18 @@ Here are the available REST API endpoints for user and room management.
 * **Get all available rooms**
     * `GET /api/room/all`
 
-## 🚀 Real-time Communication (WebSockets)
+##  Real-time Communication (WebSockets)
 
 * **Authentication**: The WebSocket connection is initiated with the user's JWT passed as a query parameter or in the initial handshake.
 * **Join Room**: After authentication, the client sends a message to join a specific `roomId`.
 * **Send Message**: The client sends a JSON payload containing the message content and `roomId`. The server then broadcasts this message to all other clients in the same room.
 
-## 📨 Message Persistence with Kafka
+##  Message Persistence with Kafka
 
 * **Producer**: The main application server acts as a Kafka **producer**. When a message is received via WebSocket, it's immediately sent to a specific Kafka topic (e.g., `chat-messages`).
 * **Consumer**: A dedicated background worker acts as a Kafka **consumer**. It subscribes to the `chat-messages` topic, consumes messages as they arrive, and saves them to the `messages` table in the PostgreSQL database.
 
-## 🏁 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
