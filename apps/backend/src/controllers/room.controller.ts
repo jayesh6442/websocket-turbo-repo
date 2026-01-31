@@ -17,7 +17,7 @@ export async function getRooms(req: Request, res: Response) {
 
 export async function getRoomById(req: Request, res: Response) {
     const { id } = req.params;
-
+    console.log(id);
     if (!id) {
         return res.status(400).json({ error: "Invalid room ID" });
     }

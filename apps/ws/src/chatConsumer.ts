@@ -4,41 +4,52 @@ import prisma from "@repo/db";
 import { roomManager } from "./roomManager.js";
 
 export async function startChatConsumer() {
-    await kafkaConsumer.connect(); // Ensure consumer is connected
+    // Consumer is already connected via initKafka()
     await kafkaConsumer.subscribe({ topic: "chat-messages" });
+    console.log("📥 Subscribed to topic: chat-messages");
 
     await kafkaConsumer.run({
         eachMessage: async ({ message }) => {
             if (!message.value) return;
-            const event = JSON.parse(message.value.toString()) as {
-                roomId: string;
-                content: string;
-                senderId: string;
-                createdAt: string;
-            };
+            
+            try {
+                const event = JSON.parse(message.value.toString()) as {
+                    roomId: string;
+                    content: string;
+                    senderId: string;
+                    createdAt: string;
+                };
 
-            // Persist to DB
-            const saved = await prisma.message.create({
-                data: {
-                    content: event.content,
-                    senderId: event.senderId,
-                    roomId: event.roomId,
-                    createdAt: new Date(event.createdAt),
-                },
-                include: { sender: { select: { id: true, name: true, email: true } } },
-            });
+                console.log("📨 Consuming message:", event);
 
-            // Broadcast to room (single source of truth from consumer)
-            roomManager.broadcast(event.roomId, {
-                type: "chat:new",
-                payload: {
-                    id: saved.id,
-                    content: saved.content,
-                    sender: saved.sender,
-                    createdAt: saved.createdAt,
-                    roomId: saved.roomId,
-                },
-            });
+                // Persist to DB
+                const saved = await prisma.message.create({
+                    data: {
+                        content: event.content,
+                        senderId: event.senderId,
+                        roomId: event.roomId,
+                        createdAt: new Date(event.createdAt),
+                    },
+                    include: { sender: { select: { id: true, name: true, email: true } } },
+                });
+
+                // Broadcast to room (single source of truth from consumer)
+                roomManager.broadcast(event.roomId, {
+                    type: "chat:new",
+                    payload: {
+                        id: saved.id,
+                        content: saved.content,
+                        sender: saved.sender,
+                        createdAt: saved.createdAt,
+                        roomId: saved.roomId,
+                    },
+                });
+                
+                console.log("✅ Message persisted and broadcasted");
+            } catch (error: any) {
+                console.error("❌ Error processing message:", error.message);
+                // Don't throw - continue processing other messages
+            }
         },
     });
 }

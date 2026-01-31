@@ -8,8 +8,8 @@
     "@types/express": "^5.0.3"
   },
   "scripts": {
-     "dev": "bun run --watch src/index.ts",  
-    "start": "bun run src/index.ts",        
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist"
   },
   "peerDependencies": {
@@ -18,8 +18,10 @@
   "dependencies": {
     "@repo/db": "*",
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "zod": "^4.0.17"
