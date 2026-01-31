@@ -34,8 +34,8 @@ export function RegisterCard() {
     try {
       await register(email, password, name)
       router.push("/")
-    } catch (err: any) {
-      setError(err.message || "Registration failed")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed")
     } finally {
       setIsLoading(false)
     }

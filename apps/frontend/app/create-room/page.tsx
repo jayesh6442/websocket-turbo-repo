@@ -36,8 +36,8 @@ export default function CreateRoomPage() {
     try {
       const room = await roomAPI.create(token, roomName);
       router.push(`/chat/${room.id}`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to create room');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create room');
     } finally {
       setIsLoading(false);
     }

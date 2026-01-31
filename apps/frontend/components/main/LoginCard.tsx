@@ -33,8 +33,8 @@ export function LoginCard() {
     try {
       await login(email, password)
       router.push("/")
-    } catch (err: any) {
-      setError(err.message || "Login failed")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed")
     } finally {
       setIsLoading(false)
     }

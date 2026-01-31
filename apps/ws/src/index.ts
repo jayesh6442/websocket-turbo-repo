@@ -35,6 +35,7 @@ function startWebSocketServer() {
         // Add error handlers BEFORE creating the server to catch early errors
         wss = new WebSocketServer({ 
             port: PORT,
+            maxPayload: 1000000, // 1MB
             perMessageDeflate: false,
             clientTracking: true,
         });

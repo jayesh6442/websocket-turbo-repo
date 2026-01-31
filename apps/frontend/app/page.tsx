@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { roomAPI, Room } from '@/lib/api';
@@ -18,7 +17,6 @@ import Link from 'next/link';
 
 export default function Home() {
   const { user, token, logout } = useAuth();
-  const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,8 +29,8 @@ export default function Home() {
         setIsLoading(true);
         const data = await roomAPI.getAll(token);
         setRooms(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load rooms');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load rooms');
       } finally {
         setIsLoading(false);
       }

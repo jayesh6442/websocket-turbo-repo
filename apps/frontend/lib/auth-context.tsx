@@ -22,6 +22,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    // Only run in browser (not during SSR/build)
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
     // Load from localStorage on mount
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
@@ -36,8 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
         .catch(() => {
           // Token invalid, clear storage
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
           setToken(null);
           setUser(null);
         })
@@ -51,9 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response: LoginResponse = await authAPI.login(email, password);
     setToken(response.token);
     setUser(response.user);
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('user', JSON.stringify(response.user));
-    router.push('/');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+    }
+    try {
+      router.push('/');
+    } catch {
+      // Fallback if router not available
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+    }
   };
 
   const register = async (email: string, password: string, name: string) => {
@@ -65,9 +82,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    try {
+      router.push('/login');
+    } catch {
+      // Fallback if router not available
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
   };
 
   return (

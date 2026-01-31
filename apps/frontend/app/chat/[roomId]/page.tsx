@@ -20,7 +20,7 @@ const formatTime = (date: string | Date) => {
 export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
-  const roomId = params.roomId as string;
+  const roomId = params?.roomId as string;
   const { user, token } = useAuth();
   const [roomName, setRoomName] = useState('');
   const [messageText, setMessageText] = useState('');
