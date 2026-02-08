@@ -1,4 +1,3 @@
-// apps/ws/src/roomManager.ts
 import { WebSocket } from "ws";
 
 export class RoomManager {
@@ -43,5 +42,4 @@ export class RoomManager {
     }
 }
 
-// 👇 export ONE shared instance
 export const roomManager = new RoomManager();

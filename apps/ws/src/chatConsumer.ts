@@ -4,7 +4,6 @@ import prisma from "@repo/db";
 import { roomManager } from "./roomManager.js";
 
 export async function startChatConsumer() {
-    // Consumer is already connected via initKafka()
     await kafkaConsumer.subscribe({ topic: "chat-messages" });
     console.log("📥 Subscribed to topic: chat-messages");
 
@@ -48,7 +47,6 @@ export async function startChatConsumer() {
                 console.log("✅ Message persisted and broadcasted");
             } catch (error: any) {
                 console.error("❌ Error processing message:", error.message);
-                // Don't throw - continue processing other messages
             }
         },
     });
