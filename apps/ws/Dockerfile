@@ -9,9 +9,11 @@ COPY package.json bun.lock* ./
 COPY apps/ws/package.json ./apps/ws/
 COPY packages/db/package.json ./packages/db/
 COPY packages/kafka/package.json ./packages/kafka/
+COPY packages/db/prisma ./packages/db/prisma/
 # Install all dependencies
 # Note: Use 'bun install --frozen-lockfile' for production after lockfile is synced
 RUN bun install
+RUN bunx prisma generate --schema=packages/db/prisma/schema.prisma
 
 # Build
 FROM base AS build
