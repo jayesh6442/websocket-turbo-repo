@@ -1,6 +1,12 @@
 import jwt from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET || "supersecret";
+let SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("JWT_SECRET is required in production");
+  }
+  SECRET = "supersecret";
+}
 
 export function signToken(payload: object) {
   return jwt.sign(payload, SECRET, { expiresIn: "1h" });
